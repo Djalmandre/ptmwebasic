@@ -480,7 +480,7 @@ def main():
 			st.image(str(img1), width=140)
 	with cols_hdr[1]:
 		st.markdown('<h1 style="text-align: center;" class="glow">🚀 SISTEMA PTM JSL 2.0</h1>', unsafe_allow_html=True)
-		st.markdown('<p style="text-align: center; color: #b0c4de; font-size: 14px;">Sistema Avançado de Consultas e Monitoramento - GitHub Integration</p>', unsafe_allow_html=True)
+		st.markdown('<p style="text-align: center; color: #b0c4de; font-size: 14px;">Sistema Avançado de Consultas e Monitoramento - 2.0 PT GT. </p>', unsafe_allow_html=True)
 	with cols_hdr[2]:
 		if img2.exists():
 			st.image(str(img2), width=140)
@@ -1266,11 +1266,40 @@ def main():
 				cols_exibir = [c for c in ['Pedido', 'Remessa', 'Dias de Atraso', 'Status', 'Data do Pedido', 'Data Prevista', 'Destino Ativo'] if c in df_show.columns]
 				st.dataframe(df_show[cols_exibir].sort_values('Dias de Atraso', ascending=False).fillna(''), use_container_width=True, height=450)
 
-				csv = df_show.to_csv(index=False, encoding='utf-8-sig')
-				st.download_button(label="📥 Exportar PTMs em atraso (XLSX)", data=csv, file_name=f"ptms_em_atraso_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx", mime='text/xlsx')
-			else:
-				st.success("✅ Nenhuma PTM em atraso no momento")
-
+			try:
+				# Exportar como XLSX
+				towrite_xlsx = io.BytesIO()
+				with pd.ExcelWriter(towrite_xlsx, engine='openpyxl') as writer:
+					df_export = df_show[cols_exibir].copy()
+					df_export.to_excel(writer, index=False, sheet_name='PTMs em atraso')
+				towrite_xlsx.seek(0)
+				
+				# Exportar como XLSM
+				towrite_xlsm = io.BytesIO()
+				with pd.ExcelWriter(towrite_xlsm, engine='openpyxl') as writer:
+					df_export = df_show[cols_exibir].copy()
+					df_export.to_excel(writer, index=False, sheet_name='PTMs em atraso')
+				towrite_xlsm.seek(0)
+				
+				col1, col2 = st.columns(2)
+				with col1:
+					st.download_button(
+						label='📥 Exportar PTMs em atraso (XLSX)',
+						data=towrite_xlsx.getvalue(),
+						file_name=f'ptms_em_atraso_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx',
+						mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+						use_container_width=True
+					)
+				with col2:
+					st.download_button(
+						label='📥 Exportar PTMs em atraso (XLSM)',
+						data=towrite_xlsm.getvalue(),
+						file_name=f'ptms_em_atraso_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsm',
+						mime='application/vnd.ms-excel.sheet.macroEnabled.12',
+						use_container_width=True
+					)
+			except Exception:
+				st.error('❌ Erro ao preparar arquivo Excel para download.')
 		st.markdown('---')
 
 	# Rodapé personalizado
