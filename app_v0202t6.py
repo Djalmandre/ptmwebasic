@@ -1267,7 +1267,7 @@ def main():
 				st.dataframe(df_show[cols_exibir].sort_values('Dias de Atraso', ascending=False).fillna(''), use_container_width=True, height=450)
 
 				csv = df_show.to_csv(index=False, encoding='utf-8-sig')
-				st.download_button(label="📥 Exportar PTMs em atraso (CSV)", data=csv, file_name=f"ptms_em_atraso_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv", mime='text/csv')
+				st.download_button(label="📥 Exportar PTMs em atraso (XLSX)", data=csv, file_name=f"ptms_em_atraso_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx", mime='text/xlsx')
 			else:
 				st.success("✅ Nenhuma PTM em atraso no momento")
 
@@ -1290,6 +1290,7 @@ if __name__ == '__main__':
 	except Exception:
 
 		main()
+
 
 
 
